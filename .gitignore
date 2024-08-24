@@ -1,0 +1,5 @@
+#Ignore these files and foulders
+.DS_Store
+
+__pycache__/
+
