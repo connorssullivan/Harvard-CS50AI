@@ -70,6 +70,7 @@ def main():
         sys.exit("Person not found.")
 
     path = shortest_path(source, target)
+    print(path)
 
     if path is None:
         print("Not connected.")
@@ -93,22 +94,36 @@ def shortest_path(source, target):
     """
   
     frontier = StackFrontier()
+    explored = set()
     path = []
  
-    node = Node(state=source, parent=None, action=0)
+    node = Node(state=source, parent=None, action=None)
     #neighbors = neighbors_for_person(source)
     frontier.add(node)
-    i = 0
-    while not frontier.empty():
-        i += 1
-        node = frontier.remove()
-        print(f"Node: {node.state}")
-        for movie_id, person_id in neighbors_for_person(node.state):
-            print(f"{i}: Movie ID: {movie_id}, Person ID: {person_id}")
-            #frontier.add(Node(state=person_id_for_name(neighbor[1]), parent=node, action=i))
-        #print(f"Neighbors: {str(frontier.frontier)}")
 
-    #print('Names:' + str(names) + '\nPeople:' + str(people) + '\nMovies:' + str(movies))
+    #Go through the frontier until we find the target or the frontier is empty
+    while not frontier.empty():
+        node = frontier.remove()
+
+        # Check if we've found the target
+        if node.state == target:
+            print("Found the target")
+            # Reconstruct the path from target to source
+            path = []
+            while node.parent is not None:
+                path.append((node.action, node.state))
+                node = node.parent
+            path.reverse()
+            return path
+            
+
+        explored.add(node.state)
+        
+        for movie_id, person_id in neighbors_for_person(node.state):
+            if not frontier.contains_state(person_id) and person_id not in explored:
+                #print(f"Adding {person_id} to the frontier")
+                child = Node(state=person_id, parent=node, action=movie_id)
+                frontier.add(child)
 
 
 
